@@ -24,6 +24,7 @@ public class DownloadTask implements Runnable {
     private Semaphore mTaskSemaphore;
     //下载完成后显示图片的分发器
     private LoadImageDispatcher mLoadImageDispatcher;
+
     public DownloadTask(ImageTaskInfo info, Semaphore mTaskSemaphore, LoadImageDispatcher mLoadImageDispatcher) {
         this.info = info;
         this.mTaskSemaphore = mTaskSemaphore;
@@ -41,7 +42,6 @@ public class DownloadTask implements Runnable {
             mTaskSemaphore.acquire();
             downLoad();
         } catch (Exception e) {
-            Log.i("SwiftImageLoader",e.getMessage());
         } finally {
             mTaskSemaphore.release();
         }
@@ -96,7 +96,8 @@ public class DownloadTask implements Runnable {
 
     /**
      * 下载并添加硬盘缓存
-     *此处可加入下载的监听，例如onStart,onComplete,onProcess，调整图片大小等监听方法，懒得搞
+     * 此处可加入下载的监听，例如onStart,onComplete,onProcess，调整图片大小等监听方法，懒得搞
+     *
      * @return 返回下载好的图片
      */
     private Bitmap DownLoadAndAddDiskCache() {
@@ -108,7 +109,12 @@ public class DownloadTask implements Runnable {
             URL url = new URL(info.getUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             is = new BufferedInputStream(conn.getInputStream());
-            is.mark(is.available());
+//            is.mark(is.available());
+            if (is.markSupported()){
+                is.mark(1024*1024);
+            }else{
+                throw new RuntimeException("SwiftImageLoader'S InputStream not support mark!");
+            }
             //获取图片的信息，通过options来只加载信息不全部加载图片
             BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inJustDecodeBounds = true;
