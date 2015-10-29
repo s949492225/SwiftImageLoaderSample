@@ -45,6 +45,11 @@ public class DownLoadTaskDispatcher extends Thread {
                 public void handleMessage(Message msg) {
                     //执行下载任务
                     mTaskThreadPool.execute(newDownLoadTask(mImageTaskInfoQueue.removeLast(), mTaskSemaphore));
+                    try {
+                        mTaskSemaphore.acquire();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             };
             //释放初始化安全控制的信号量

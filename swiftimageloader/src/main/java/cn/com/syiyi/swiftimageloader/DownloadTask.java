@@ -39,7 +39,7 @@ public class DownloadTask implements Runnable {
     @Override
     public void run() {
         try {
-            mTaskSemaphore.acquire();
+
             downLoad();
         } catch (Exception e) {
         } finally {
